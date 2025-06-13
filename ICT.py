@@ -4,7 +4,7 @@ import os
 import cv2
 
 
-dir_path = '/Users/krishnamehta/Desktop/Image Color Transfer/Kodak Color Plus 200'
+dir_path = '/Users/krishnamehta/Desktop/Image Color Transfer/NewDir'
 image_path = '/Users/krishnamehta/Desktop/Image Color Transfer/IMG_2559.JPG' 
 
 def get_image_props(path):
@@ -16,6 +16,7 @@ def get_image_props(path):
 def get_color_palette(path):
     
     files = os.listdir(path)
+    print(files)
     
     image_paths=[]
     for i in files:
@@ -30,9 +31,9 @@ def get_color_palette(path):
         for i in range(w):
             for j in range(h):
                 B,G,R = image[j,i]
-                R, G, B  = str(R).zfill(3), str(G).zfill(3), str(B).zfill(3)
+                #R, G, B  = str(R).zfill(3), str(G).zfill(3), str(B).zfill(3)
                 #rgb_arr = " ".join([str(R).zfill(3), str(G).zfill(3), str(B).zfill(3)])
-                unique_colors.append([int(R), int(G), int(B)])
+                unique_colors.append([int(B), int(G), int(R)])
             
         #print("Total Unique Colors: ", len(unique_colors))
         print(f"image {img} complete")
@@ -50,31 +51,29 @@ def get_image_rgb(path):
         rgb_row = [] 
         for j in range(h):
             B,G,R = imageTC[j, i]
-            R, G, B = str(R).zfill(3), str(G).zfill(3), str(B).zfill(3) 
+            #R, G, B = str(R).zfill(3), str(G).zfill(3), str(B).zfill(3) 
             #rgb_str2 = " ".join([str(R).zfill(3), str(G).zfill(3), str(B).zfill(3)])
-            rgb_row.append([int(R), int(G), int(B)])
+            rgb_row.append([int(B), int(G), int(R)])
         imageTC_rgb.append(rgb_row)
 
     image_2np =np.array(imageTC_rgb) 
     return image_2np 
-        
-'''
-# Displays Image #
-cv2.imshow("RGB Image", np.array(imageTC_rgb))
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-'''
+  
+
+
 colors = get_color_palette(dir_path)
 og_image = get_image_rgb(image_path)
 og_img_shape = og_image.shape
 
-threed_twod = og_image.reshape(-1, og_img_shape[2])
+threed_twod = og_image.reshape((og_img_shape[0] * og_img_shape[1]), og_img_shape[2])
 
+'''
+for i in range(len(colors)):
+    if colors[i] in threed_twod:
+'''        
 
 #print(colors.shape)
 #print( og_image, threed_twod)
-
-
 A = colors
 B = threed_twod
 
@@ -82,22 +81,23 @@ tree = KDTree(A, leaf_size=40)
 
 dist, ind = tree.query(B, k=1)
 
-#print(dist,ind)
+print(dist,ind)
 
 new_image_map = []
 
 for i in ind:
     for j in i:
-        new_image_map.append(colors[j])
+        new_image_map.append(colors[i])
 
 new_image_map = np.array(new_image_map)
 
 output_image = new_image_map.reshape(og_img_shape)
 
-print(output_image.astype(np.unit8)
+print(output_image.dtype)
 
-'''
-cv2.imshow("RGB Image", output_image)
+final_image = output_image.astype(np.uint8) 
+final_img_rotate = cv2.rotate(final_image, cv2.ROTATE_90_CLOCKWISE)
+
+cv2.imshow("RGB Image", final_img_rotate)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-'''
