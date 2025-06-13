@@ -64,7 +64,7 @@ cv2.imshow("RGB Image", np.array(imageTC_rgb))
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 '''
-#colors = get_color_palette(dir_path)
+colors = get_color_palette(dir_path)
 og_image = get_image_rgb(image_path)
 og_img_shape = og_image.shape
 
@@ -72,7 +72,32 @@ threed_twod = og_image.reshape(-1, og_img_shape[2])
 
 
 #print(colors.shape)
-print( og_image[40] , threed_twod[40])
+#print( og_image, threed_twod)
 
 
+A = colors
+B = threed_twod
 
+tree = KDTree(A, leaf_size=40)
+
+dist, ind = tree.query(B, k=1)
+
+#print(dist,ind)
+
+new_image_map = []
+
+for i in ind:
+    for j in i:
+        new_image_map.append(colors[j])
+
+new_image_map = np.array(new_image_map)
+
+output_image = new_image_map.reshape(og_img_shape)
+
+print(output_image.astype(np.unit8)
+
+'''
+cv2.imshow("RGB Image", output_image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+'''
