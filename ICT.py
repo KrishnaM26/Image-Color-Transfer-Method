@@ -39,8 +39,8 @@ def get_color_palette(path):
         print(f"image {img} complete")
     
     color_palette = np.array(unique_colors)
-    unique_palette = np.unique(color_palette, axis=0)
-    return unique_palette
+    unique_palette = np.unique(color_palette, axis = 0)
+    return unique_palette 
 
 
 def get_image_rgb(path):
@@ -66,11 +66,6 @@ og_image = get_image_rgb(image_path)
 og_img_shape = og_image.shape
 
 threed_twod = og_image.reshape((og_img_shape[0] * og_img_shape[1]), og_img_shape[2])
-
-'''
-for i in range(len(colors)):
-    if colors[i] in threed_twod:
-'''        
 
 #print(colors.shape)
 #print( og_image, threed_twod)
@@ -101,3 +96,4 @@ final_img_rotate = cv2.rotate(final_image, cv2.ROTATE_90_CLOCKWISE)
 cv2.imshow("RGB Image", final_img_rotate)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
+
