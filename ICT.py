@@ -1,4 +1,5 @@
 from sklearn.neighbors import KDTree
+from sklearn.cluster import KMeans
 import numpy as np
 import os 
 import cv2
@@ -6,7 +7,7 @@ import cv2
 
 dir_path = '/Users/krishnamehta/Desktop/Image Color Transfer/NewDir'
 image_path = '/Users/krishnamehta/Desktop/Image Color Transfer/IMG_2559.JPG'
-
+k=4
 
 def get_image_props(path):
     image_rgb = cv2.imread(path)
@@ -55,48 +56,48 @@ def get_image_rgb(path):
     image_2np = np.array(imageTC_bgr) 
     return image_2np 
   
+def get_hue(arr):
 
 
 colors = get_color_palette(dir_path)
 og_image = get_image_rgb(image_path)
-print(colors,colors.shape) 
-print(og_image, og_image.shape)
+#print(colors,colors.shape) 
+#print(og_image, og_image.shape)
 
+kmeans = KMeans(n_clusters = k, random_state = 42)
+kmeans.fit(colors)
 
+labels = kmeans.labels_
+centroids = kmeans.cluster_centers_
+centroids_int = centroids.astype(int)
 
-'''
+print(centroids_int)
+
 og_img_shape = og_image.shape
 
 threed_twod = og_image.reshape((og_img_shape[0] * og_img_shape[1]), og_img_shape[2])
-
-#print(colors.shape)
-#print( og_image, threed_twod)
-A = colors
+A = centroids_int 
 B = threed_twod
 
 tree = KDTree(A, leaf_size=40)
 
 dist, ind = tree.query(B, k=1)
 
-print(dist,ind)
-
 new_image_map = []
-
 for i in ind:
     for j in i:
-        new_image_map.append(colors[i])
+        new_image_map.append(A[i])
 
 new_image_map = np.array(new_image_map)
 
 output_image = new_image_map.reshape(og_img_shape)
 
-print(output_image.dtype)
-
 final_image = output_image.astype(np.uint8) 
+print(final_image[1])
 final_img_rotate = cv2.rotate(final_image, cv2.ROTATE_90_CLOCKWISE)
+flip_image = cv2.flip(final_img_rotate, 1)
 
-cv2.imshow("RGB Image", final_img_rotate)
+cv2.imshow("RGB Image", flip_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-'''
 
