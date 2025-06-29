@@ -1,13 +1,16 @@
 from sklearn.neighbors import KDTree
 from sklearn.cluster import KMeans
 import numpy as np
+import colorsys
 import os 
 import cv2
 
 
-dir_path = '/Users/krishnamehta/Desktop/Image Color Transfer/NewDir'
-image_path = '/Users/krishnamehta/Desktop/Image Color Transfer/IMG_2559.JPG'
-k=4
+dir_path = '/Users/krishnamehta/Desktop/Image Color Transfer/DirNew'
+#image_path = '/Users/krishnamehta/Desktop/Image Color Transfer/IMG_2559.JPG'
+image_path='/Users/krishnamehta/Desktop/Image Color Transfer/KCP_9.jpg'
+k=100
+l=30
 
 def get_image_props(path):
     image_rgb = cv2.imread(path)
@@ -16,7 +19,7 @@ def get_image_props(path):
 
 
 #gets unique colors to train on
-def get_color_palette(path):
+def get_color_palette(path, l):
     
     files = os.listdir(path)
     print(files)
@@ -32,12 +35,23 @@ def get_color_palette(path):
         for i in range(w):
             for j in range(h):
                 B,G,R = image[j,i]
-                unique_colors.append([B, G, R])
-        print("Total Unique Colors: ", len(unique_colors))
+                rgb = (R / 255.0, G/255.0, B/255.0)
+                
+                H, S, L = colorsys.rgb_to_hls(*rgb)
+
+                l_min = max(0.0, L-0.1)
+                l_max = min(1.0, L+0.1)
+                l_values = np.linspace(l_min, l_max, l)
+
+                for k, l_new in enumerate(l_values):
+                    r, g, b = colorsys.hls_to_rgb(H, l_new, S)
+                    unique_colors.append([int(b * 255), int(g*255), int(r*255)])
         print(f"image {img} complete")
     
     color_palette = np.array(unique_colors)
     unique_palette = np.unique(color_palette, axis = 0)
+    print("Total Unique Colors: ", len(unique_colors))
+    #print(unique_palette)
     return unique_palette
 
 
@@ -56,10 +70,11 @@ def get_image_rgb(path):
     image_2np = np.array(imageTC_bgr) 
     return image_2np 
   
-def get_hue(arr):
+    
 
 
-colors = get_color_palette(dir_path)
+
+colors = get_color_palette(dir_path, l)
 og_image = get_image_rgb(image_path)
 #print(colors,colors.shape) 
 #print(og_image, og_image.shape)
@@ -71,7 +86,7 @@ labels = kmeans.labels_
 centroids = kmeans.cluster_centers_
 centroids_int = centroids.astype(int)
 
-print(centroids_int)
+#print(centroids_int)
 
 og_img_shape = og_image.shape
 
@@ -93,7 +108,7 @@ new_image_map = np.array(new_image_map)
 output_image = new_image_map.reshape(og_img_shape)
 
 final_image = output_image.astype(np.uint8) 
-print(final_image[1])
+#print(final_image[1])
 final_img_rotate = cv2.rotate(final_image, cv2.ROTATE_90_CLOCKWISE)
 flip_image = cv2.flip(final_img_rotate, 1)
 
