@@ -10,8 +10,8 @@ dir_path = '/Users/krishnamehta/Desktop/Image Color Transfer/DirNew'
 image_path = '/Users/krishnamehta/Desktop/Image Color Transfer/IMG_2559.JPG'
 #image_path='/Users/krishnamehta/Desktop/Image Color Transfer/KCP_9.jpg'
 download_dir = r'/Users/krishnamehta/Desktop/Image Color Transfer/img_download'
-k=15
-l=50
+k=5
+l=200
 #j=0.1
 
 def get_image_props(path):
@@ -133,4 +133,4 @@ cv2.destroyAllWindows()
 os.chdir(download_dir)
 file_name = f'KCP_2-9_{k}_{l}_.jpg'
 cv2.imwrite(file_name, flip_image)
-print(f'image: {k}, {l}, {j} saved')
+print(f'image: {k}, {l}  saved')
