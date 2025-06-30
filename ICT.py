@@ -7,10 +7,12 @@ import cv2
 
 
 dir_path = '/Users/krishnamehta/Desktop/Image Color Transfer/DirNew'
-#image_path = '/Users/krishnamehta/Desktop/Image Color Transfer/IMG_2559.JPG'
-image_path='/Users/krishnamehta/Desktop/Image Color Transfer/KCP_9.jpg'
-k=100
-l=30
+image_path = '/Users/krishnamehta/Desktop/Image Color Transfer/IMG_2559.JPG'
+#image_path='/Users/krishnamehta/Desktop/Image Color Transfer/KCP_9.jpg'
+download_dir = r'/Users/krishnamehta/Desktop/Image Color Transfer/img_download'
+k=15
+l=50
+#j=0.1
 
 def get_image_props(path):
     image_rgb = cv2.imread(path)
@@ -19,7 +21,7 @@ def get_image_props(path):
 
 
 #gets unique colors to train on
-def get_color_palette(path, l):
+def get_color_palette(path):
     
     files = os.listdir(path)
     print(files)
@@ -35,18 +37,8 @@ def get_color_palette(path, l):
         for i in range(w):
             for j in range(h):
                 B,G,R = image[j,i]
-                rgb = (R / 255.0, G/255.0, B/255.0)
-                
-                H, S, L = colorsys.rgb_to_hls(*rgb)
-
-                l_min = max(0.0, L-0.1)
-                l_max = min(1.0, L+0.1)
-                l_values = np.linspace(l_min, l_max, l)
-
-                for k, l_new in enumerate(l_values):
-                    r, g, b = colorsys.hls_to_rgb(H, l_new, S)
-                    unique_colors.append([int(b * 255), int(g*255), int(r*255)])
-        print(f"image {img} complete")
+                unique_colors.append([B, G, R])
+        print(f"image {img} training complete")
     
     color_palette = np.array(unique_colors)
     unique_palette = np.unique(color_palette, axis = 0)
@@ -70,11 +62,31 @@ def get_image_rgb(path):
     image_2np = np.array(imageTC_bgr) 
     return image_2np 
   
-    
+
+def get_lrange(arr, l):
+
+    unique_colors = []
+    for i in arr:
+         B,G,R = i
+         rgb = (R / 255.0, G/255.0, B/255.0) 
+         H, L, S = colorsys.rgb_to_hls(*rgb)
+
+         #l_min = max(0.0, L - j)
+         #l_max = min(1.0, L + j)  
+         l_values = np.linspace(0.0, 1.0, l)
+
+         for _, l_new in enumerate(l_values):
+            r, g, b = colorsys.hls_to_rgb(H, l_new, S)
+            unique_colors.append([int(b * 255), int(g*255), int(r*255)])
+
+    color_palette = np.array(unique_colors)
+    unique_palette_range = np.unique(color_palette, axis = 0)
+    print('palette created!') 
+    return unique_palette_range
 
 
 
-colors = get_color_palette(dir_path, l)
+colors = get_color_palette(dir_path)
 og_image = get_image_rgb(image_path)
 #print(colors,colors.shape) 
 #print(og_image, og_image.shape)
@@ -88,10 +100,12 @@ centroids_int = centroids.astype(int)
 
 #print(centroids_int)
 
+color_palette_range = get_lrange(centroids_int, l)
+
 og_img_shape = og_image.shape
 
 threed_twod = og_image.reshape((og_img_shape[0] * og_img_shape[1]), og_img_shape[2])
-A = centroids_int 
+A = color_palette_range
 B = threed_twod
 
 tree = KDTree(A, leaf_size=40)
@@ -116,3 +130,7 @@ cv2.imshow("RGB Image", flip_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
+os.chdir(download_dir)
+file_name = f'KCP_2-9_{k}_{l}_.jpg'
+cv2.imwrite(file_name, flip_image)
+print(f'image: {k}, {l}, {j} saved')
