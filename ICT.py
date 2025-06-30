@@ -6,11 +6,11 @@ import os
 import cv2
 
 
-dir_path = '/Users/krishnamehta/Desktop/Image Color Transfer/DirNew'
-image_path = '/Users/krishnamehta/Desktop/Image Color Transfer/IMG_2559.JPG'
-#image_path='/Users/krishnamehta/Desktop/Image Color Transfer/KCP_9.jpg'
+dir_path = '/Users/krishnamehta/Desktop/Image Color Transfer/NewDir2'
+#image_path = '/Users/krishnamehta/Desktop/Image Color Transfer/IMG_2559.JPG'
+image_path='/Users/krishnamehta/Desktop/Image Color Transfer/KCP_9.jpg'
 download_dir = r'/Users/krishnamehta/Desktop/Image Color Transfer/img_download'
-k=5
+k=30
 l=200
 #j=0.1
 
@@ -130,7 +130,7 @@ cv2.imshow("RGB Image", flip_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
-os.chdir(download_dir)
-file_name = f'KCP_2-9_{k}_{l}_.jpg'
-cv2.imwrite(file_name, flip_image)
-print(f'image: {k}, {l}  saved')
+#os.chdir(download_dir)
+#file_name = f'KCP_2-9_{k}_{l}_.jpg'
+#cv2.imwrite(file_name, flip_image)
+#print(f'image: {k}, {l}  saved')
