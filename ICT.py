@@ -6,12 +6,13 @@ import os
 import cv2
 
 
-dir_path = '/Users/krishnamehta/Desktop/Image Color Transfer/NewDir2'
+dir_path = '/Users/krishnamehta/Desktop/Image Color Transfer/newDir6'
 #image_path = '/Users/krishnamehta/Desktop/Image Color Transfer/IMG_2559.JPG'
-image_path='/Users/krishnamehta/Desktop/Image Color Transfer/KCP_9.jpg'
+image_path='/Users/krishnamehta/Desktop/Image Color Transfer/KCP_5.jpg'
 download_dir = r'/Users/krishnamehta/Desktop/Image Color Transfer/img_download'
-k=30
-l=200
+k=50
+l=1000
+add_noise = False
 #j=0.1
 
 def get_image_props(path):
@@ -48,9 +49,20 @@ def get_color_palette(path):
 
 
 ## converts image to edit to BGR codes
-def get_image_rgb(path):
+def get_image_rgb(path, noise):
 
+    #get image from path
     imageTC, h, w = get_image_props(path) 
+    
+    if noise:
+        #add gaussian noise
+        mean,std = 0, 25
+        gaussian_noise = np.random.normal(mean, std, imageTC.shape).astype(np.float32)
+        dst = cv2.add(imageTC.astype(np.float32), gaussian_noise)
+
+        dst = np.clip(dst, 0, 255).astype(np.uint8)
+        imageTC = dist
+
     imageTC_bgr = []
     for i in range(w):
         bgr_row = [] 
@@ -71,8 +83,6 @@ def get_lrange(arr, l):
          rgb = (R / 255.0, G/255.0, B/255.0) 
          H, L, S = colorsys.rgb_to_hls(*rgb)
 
-         #l_min = max(0.0, L - j)
-         #l_max = min(1.0, L + j)  
          l_values = np.linspace(0.0, 1.0, l)
 
          for _, l_new in enumerate(l_values):
@@ -87,20 +97,23 @@ def get_lrange(arr, l):
 
 
 colors = get_color_palette(dir_path)
-og_image = get_image_rgb(image_path)
+og_image = get_image_rgb(image_path, add_noise)
 #print(colors,colors.shape) 
 #print(og_image, og_image.shape)
 
 kmeans = KMeans(n_clusters = k, random_state = 42)
 kmeans.fit(colors)
 
-labels = kmeans.labels_
+#labels = kmeans.labels_
 centroids = kmeans.cluster_centers_
 centroids_int = centroids.astype(int)
 
-#print(centroids_int)
+
+
 
 color_palette_range = get_lrange(centroids_int, l)
+
+print('editing image...')
 
 og_img_shape = og_image.shape
 
@@ -126,7 +139,9 @@ final_image = output_image.astype(np.uint8)
 final_img_rotate = cv2.rotate(final_image, cv2.ROTATE_90_CLOCKWISE)
 flip_image = cv2.flip(final_img_rotate, 1)
 
-cv2.imshow("RGB Image", flip_image)
+print('image complete.')
+
+cv2.imshow("BGR Image", flip_image)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
