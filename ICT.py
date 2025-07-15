@@ -6,13 +6,13 @@ import os
 import cv2
 
 
-dir_path = '/Users/krishnamehta/Desktop/Image Color Transfer/newDir6'
+dir_path = '/Users/krishnamehta/Desktop/Image Color Transfer/newDir7'
 #image_path = '/Users/krishnamehta/Desktop/Image Color Transfer/IMG_2559.JPG'
-image_path='/Users/krishnamehta/Desktop/Image Color Transfer/KCP_5.jpg'
+image_path='/Users/krishnamehta/Desktop/Image Color Transfer/ICT_1.jpg'
 download_dir = r'/Users/krishnamehta/Desktop/Image Color Transfer/img_download'
-k=50
+k=30
 l=1000
-add_noise = False
+add_noise = False 
 #j=0.1
 
 def get_image_props(path):
@@ -25,7 +25,7 @@ def get_image_props(path):
 def get_color_palette(path):
     
     files = os.listdir(path)
-    print(files)
+    print(f'Training Data: {files}')
     
     image_paths=[]
     for i in files:
@@ -61,7 +61,7 @@ def get_image_rgb(path, noise):
         dst = cv2.add(imageTC.astype(np.float32), gaussian_noise)
 
         dst = np.clip(dst, 0, 255).astype(np.uint8)
-        imageTC = dist
+        imageTC = dst
 
     imageTC_bgr = []
     for i in range(w):
@@ -101,7 +101,7 @@ og_image = get_image_rgb(image_path, add_noise)
 #print(colors,colors.shape) 
 #print(og_image, og_image.shape)
 
-kmeans = KMeans(n_clusters = k, random_state = 42)
+kmeans = KMeans(n_clusters = k, random_state = 0)
 kmeans.fit(colors)
 
 #labels = kmeans.labels_
